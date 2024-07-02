@@ -10,6 +10,7 @@ import { mariadbMigrations } from './database/migrations/mariadb'
 import { postgresMigrations } from './database/migrations/postgres'
 
 let appDataSource: DataSource
+console.log(localStorage.getItem('token'))
 
 export const init = async (): Promise<void> => {
     let homePath

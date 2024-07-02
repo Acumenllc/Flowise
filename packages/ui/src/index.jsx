@@ -2,6 +2,7 @@ import React from 'react'
 import App from '@/App'
 import { store } from '@/store'
 import { createRoot } from 'react-dom/client'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 
 // style + assets
 import '@/assets/scss/style.scss'
@@ -23,7 +24,9 @@ root.render(
                 <SnackbarProvider>
                     <ConfirmContextProvider>
                         <ReactFlowContext>
-                            <App />
+                            <GoogleOAuthProvider clientId='255473309794-ide1eujakl7e4o1rom5ciq4ub4tbjrcj.apps.googleusercontent.com'>
+                                <App />
+                            </GoogleOAuthProvider>
                         </ReactFlowContext>
                     </ConfirmContextProvider>
                 </SnackbarProvider>

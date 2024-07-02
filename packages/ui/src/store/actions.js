@@ -1,4 +1,5 @@
 // action - customization reducer
+import axios from 'axios'
 export const SET_MENU = '@customization/SET_MENU'
 export const MENU_TOGGLE = '@customization/MENU_TOGGLE'
 export const MENU_OPEN = '@customization/MENU_OPEN'
@@ -25,6 +26,11 @@ export const REMOVE_SNACKBAR = 'REMOVE_SNACKBAR'
 export const SHOW_CONFIRM = 'SHOW_CONFIRM'
 export const HIDE_CONFIRM = 'HIDE_CONFIRM'
 
+// action - auth reducer
+export const VERIFY = 'VERIFY'
+export const LOGOUT = 'LOGOUT'
+export const LOADING = 'LOADING'
+
 export const enqueueSnackbar = (notification) => {
     const key = notification.options && notification.options.key
 
@@ -47,3 +53,26 @@ export const removeSnackbar = (key) => ({
     type: REMOVE_SNACKBAR,
     key
 })
+
+export const verifyToken = () => {
+    const token = localStorage.getItem('token')
+    return async (dispatch) => {
+        try {
+            dispatch({ type: LOADING }) // Dispatch loading action before making the API call
+            const response = await axios.get('/api/v1/auth/verify', {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (response.status === 200) {
+                const data = response.data
+                // Token verification successful
+                dispatch({ type: VERIFY, payload: { email: data.email, name: data.name } })
+            } else {
+                // Token verification failed
+                dispatch({ type: LOGOUT, payload: { email: '', name: '' } }) // Added closing parenthesis
+            }
+        } catch (error) {
+            console.error('Error verifying token:', error)
+            dispatch({ type: LOGOUT, payload: { email: '', name: '' } }) // Added closing parenthesis
+        }
+    }
+}

@@ -1,29 +1,50 @@
-import { useSelector } from 'react-redux'
-
+import { useEffect, useMemo } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { ThemeProvider } from '@mui/material/styles'
-import { CssBaseline, StyledEngineProvider } from '@mui/material'
-
-// routing
+import { CssBaseline, StyledEngineProvider, CircularProgress } from '@mui/material'
+import { verifyToken } from './store/actions'
 import Routes from '@/routes'
-
-// defaultTheme
 import themes from '@/themes'
-
-// project imports
 import NavigationScroll from '@/layout/NavigationScroll'
-
-// ==============================|| APP ||============================== //
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const App = () => {
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const location = useLocation()
+
+    const { isAuthenticated, isLoading } = useSelector(
+        useMemo(
+            () => (state) => ({
+                isAuthenticated: state.auth.isAuthenticated,
+                isLoading: state.auth.isLoading
+            }),
+            []
+        )
+    )
+
     const customization = useSelector((state) => state.customization)
+
+    useEffect(() => {
+        dispatch(verifyToken())
+    }, [dispatch])
+
+    if (!isAuthenticated && !isLoading && location.pathname !== '/auth') {
+        navigate('/auth')
+        return null
+    }
 
     return (
         <StyledEngineProvider injectFirst>
             <ThemeProvider theme={themes(customization)}>
                 <CssBaseline />
-                <NavigationScroll>
-                    <Routes />
-                </NavigationScroll>
+                {!isLoading ? (
+                    <NavigationScroll>
+                        <Routes />
+                    </NavigationScroll>
+                ) : (
+                    <CircularProgress />
+                )}
             </ThemeProvider>
         </StyledEngineProvider>
     )
